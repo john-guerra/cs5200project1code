@@ -18,7 +18,7 @@ router.get("/districts/:districtId", async function (req, res) {
   const districtId = req.params.districtId;
   console.log("got district details ", districtId);
   const district = await myDB.getDistrictByID(districtId);
-  console.log("district created");
+  console.log("got district by id");
   res.render("districtDetails", {district: district});
 });
 

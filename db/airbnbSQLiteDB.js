@@ -13,7 +13,7 @@ async function connect() {
 async function getDistricts() {
   const db = await connect();
   //return await db.all("SELECT * FROM District");
-  try{
+  try {
     return await db.all("SELECT * FROM District");
   } finally {
     await db.close();
@@ -21,17 +21,22 @@ async function getDistricts() {
 }
 
 async function getDistrictByID(districtId) {
-  const db = await connect();
-  const stmt = await db.prepare(`SELECT *
+  let db, stmt;
+  try {
+    db = await connect();
+    stmt = await db.prepare(`SELECT *
     FROM District
     WHERE
       districtId = :districtId
   `);
-  stmt.bind({
-    ":districtId": districtId,
-  });
-  return await stmt.get();
-
+    stmt.bind({
+      ":districtId": districtId,
+    });
+    return await stmt.get();
+  } finally {
+    stmt.finalize();
+    db.close();
+  }
 }
 
 async function createDistrict(newDistrict) {
@@ -44,7 +49,6 @@ async function createDistrict(newDistrict) {
     ":districtName": newDistrict.districtName,
   });
   return await stmt.run();
-
 }
 
 /**
@@ -62,7 +66,6 @@ async function deleteDistrict(districtToDelete) {
     ":theIDToDelete": districtToDelete.districtId,
   });
   return await stmt.run();
-
 }
 
 /**
@@ -81,7 +84,6 @@ async function updateDistrict(districtToUpdate) {
     ":districtIdToUpdate": districtToUpdate.districtId,
   });
   return await stmt.run();
-
 }
 module.exports.getDistricts = getDistricts;
 module.exports.createDistrict = createDistrict;
